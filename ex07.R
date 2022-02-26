@@ -170,13 +170,13 @@ sum_cs_case$n=apply(cs,1,function(x){sum(is.na(x))})
 sum_cs_case=as.data.frame(cs$ID)
 sum_cs_case$per=sum_cs_case$n/ncol(cs)*100
 sum_cs_col=as.data.frame(colnames(cs))
-sum_cs_col=sum_cs_col[-1,]
 sum_cs_col$num = apply(cs, 2, function(x){sum(is.na(x))})
 sum_cs_col$per=sum_cs_col$num/nrow(cs)*100
-
-
-
-
-
-
-
+## 204 207 210 233 261
+removeCase = sum_cs_case[sum_cs_case$per>50,]$`cs$ID`
+new_cs=cs[-which(cs$ID %in%removeCase),]
+dim(new_cs)
+View(new_cs)
+View(sum_cs_col)
+##remove column with highest MV
+new_cs = new_cs[,-2]
