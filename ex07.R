@@ -248,12 +248,53 @@ row.names(chisq_test_v5)=colnames(new_cs)[10:14]
 colnames(chisq_test_v5)=c("chi sq","is relate")
 for(i in 10:14){
   print(i)
-  chisq_test_v5$`chi sq`[i-9]=((chisq.test(table(name=new_cs[,i],v5=ifelse(is.na(new_cs$V5),0,1))))
+  chisq_test_v5$`chi sq`[i-9]=((chisq.test(table(name=new_cs[,i],
+                                    v5=ifelse(is.na(new_cs$V5),0,1))))
         $p.value)
 }
 
 chisq_test_v5$`is relate` =ifelse(chisq_test_v5>0.05,F,T) 
 ## None column is effect on v5 NA
+## we can use imputation method which for MCAR(missing completing at random) condition
+#method 1: complete case approach 
+comp_cs=new_cs[apply(new_cs,MARGIN = 1,FUN = function(x){any(is.na(x))==F}),]
+dim(comp_cs)
+mean_imput_comp <- data.frame(apply(comp_cs[2:9], 2, mean))
+colnames(mean_imput_comp) <- "all_case"
+mean_imput_comp 
+
+sd_imput_comp <- data.frame(apply(comp_cs[2:9], 2, sd))
+colnames(sd_imput_comp) <- "all_case"
+sd_imput_comp 
+#Method 2: Mean Substitution
+mean_sub_cs = new_cs
+for(i in 2:9){
+mean_sub_cs[is.na(mean_sub_cs[,i]),i]=mean(mean_sub_cs[,i],na.rm = T)
+}
+
+mean_imput_comp$mean=apply(mean_sub_cs[,2:9],2,mean)
+sd_imput_comp$mean=apply(mean_sub_cs[,2:9],2,sd)
+#method 3:Regression
+reg_cs = new_cs
+impl_reg = mice(reg_cs[,2:9],method = "norm.predict",m = 5)
+reg_cs=complete(impl_reg)
+mean_imput_comp$reg = apply(reg_cs,2,mean)
+sd_imput_comp$reg = apply(reg_cs,2,sd)
+
+## step 5 : correlation analysis----
+comp_cor = cor(comp_cs[2:9])
+mean_cor =cor(mean_sub_cs[2:9])
+reg_cor =cor(reg_cs)
+ave_cor = (comp_cor+mean_cor+reg_cor)/3
+
+#but we can get to this conclusion that complete case isn't good for this 
+#data set because its make case half and have lot differ compare to two other 
+#method
+best_ave_cor = (mean_cor+reg_cor)/2
+
+
+
+
 
 
 
