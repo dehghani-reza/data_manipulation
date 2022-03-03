@@ -161,7 +161,7 @@ for(i in 2:10){
   cs[,i]=as.numeric(cs[,i])
 }
 for(j in 11:15){
-  cs[,j]=as.factor(cs[,i])
+  cs[,j]=as.factor(cs[,j])
 }
 summary(cs)
 
@@ -174,9 +174,37 @@ sum_cs_col$num = apply(cs, 2, function(x){sum(is.na(x))})
 sum_cs_col$per=sum_cs_col$num/nrow(cs)*100
 ## 204 207 210 233 261
 removeCase = sum_cs_case[sum_cs_case$per>50,]$`cs$ID`
-new_cs=cs[-which(cs$ID %in%removeCase),]
+new_cs=cs[-which(cs$ID %in%c(204,207,210,233,261)),]
 dim(new_cs)
 View(new_cs)
 View(sum_cs_col)
 ##remove column with highest MV
 new_cs = new_cs[,-2]
+## check relation between v3 and v5 NA the base col is v5
+mean(new_cs$V3[is.na(new_cs$V5)],na.rm = T)
+mean(new_cs$V3[!is.na(new_cs$V5)],na.rm = T)
+
+boxplot(new_cs$V3[is.na(new_cs$V5)],new_cs$V3[!is.na(new_cs$V5)])
+
+sum(!is.na((new_cs$V3[is.na(new_cs$V5)])))
+sum(!is.na((new_cs$V3[!is.na(new_cs$V5)])))
+
+t.test(new_cs$V3[is.na(new_cs$V5)],
+       new_cs$V3[!is.na(new_cs$V5)],
+       alternative = "two.sided")
+#p-value = 0.8002 is significance
+#so there isn't any relationship between V5 missing value and V3
+
+## check relation between V10 and V5 NA the base col is v5
+
+is.na(new_cs$V5)
+
+table(v10=new_cs$V10,v5MV=ifelse(is.na(new_cs$V5),1,0))
+
+chisq.test(table(v10=new_cs$V10,v5MV=ifelse(is.na(new_cs$V5),1,0)))
+
+#p-value = 0.6275
+#so there isn't any relationship between V5 missing value and V10
+
+
+
