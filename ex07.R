@@ -207,4 +207,53 @@ chisq.test(table(v10=new_cs$V10,v5MV=ifelse(is.na(new_cs$V5),1,0)))
 #so there isn't any relationship between V5 missing value and V10
 
 
+#comparing all numeric data mean in two condition v5 is NA or not----
+mean_df_on_v5 = data.frame(matrix(nrow = 8,ncol = 2))
+row.names(mean_df_on_v5)=colnames(new_cs)[2:9]
+colnames(mean_df_on_v5)=c("v5 na","v5")
+for(i in 2:9){
+  mean_df_on_v5$`v5 na`[i-1]=mean(new_cs[is.na(new_cs$V5),i],na.rm = T)
+}
+for(i in 2:9){
+  mean_df_on_v5$v5[i-1]=mean(new_cs[!is.na(new_cs$V5),i],na.rm = T)
+}
+#remove v5
+mean_df_on_v5=mean_df_on_v5[-4,]
+
+mean_df_on_v5$`p.value`=rep.int(0,7)
+for(i in c(2,4)){
+  mean_df_on_v5$p.value[i-1]=(t.test(new_cs[is.na(new_cs$V5),i],
+          new_cs[!is.na(new_cs$V5),i],
+          alternative = "two.sided"))$p.value
+}
+for(i in 6:9){
+  mean_df_on_v5$p.value[i-2]=(t.test(new_cs[is.na(new_cs$V5),i],
+                                     new_cs[!is.na(new_cs$V5),i],
+                                     alternative = "two.sided"))$p.value
+}
+
+mean_df_on_v5$is.relevant=ifelse(mean_df_on_v5$p.value>=0.05,F,T)
+##all the numeric column have not any connection to V5 NA 
+
+#comparing all factor data mean in two condition v5 is NA or not----
+ifelse(is.na(new_cs$V5),0,1)
+
+for(i in 10:14){
+  print(i)
+  print(table(name=new_cs[,i],v5=ifelse(is.na(new_cs$V5),0,1)))
+}
+## chi square test 
+chisq_test_v5=data.frame(matrix(nrow = 5,ncol = 2))
+row.names(chisq_test_v5)=colnames(new_cs)[10:14]
+colnames(chisq_test_v5)=c("chi sq","is relate")
+for(i in 10:14){
+  print(i)
+  chisq_test_v5$`chi sq`[i-9]=((chisq.test(table(name=new_cs[,i],v5=ifelse(is.na(new_cs$V5),0,1))))
+        $p.value)
+}
+
+chisq_test_v5$`is relate` =ifelse(chisq_test_v5>0.05,F,T) 
+## None column is effect on v5 NA
+
+
 
