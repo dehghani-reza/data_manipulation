@@ -292,6 +292,18 @@ ave_cor = (comp_cor+mean_cor+reg_cor)/3
 #method
 best_ave_cor = (mean_cor+reg_cor)/2
 
+#outlier
+x_ex <- c(2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1000)
+y_ex <- c(2, 2, 3, 3, 3, 4, 4, 4, 10000, 100000)
+
+mean(x_ex)+3*sd(x_ex)
+x_W_OL_SD=x_ex[x_ex<mean(x_ex)+3*sd(x_ex)]
+length(y_ex[y_ex<mean(y_ex)+3*sd(y_ex)])
+# as we can see in x_ex we can identify outlier with mean+3sd but in y_ex cant 
+# so we should choose another method
+# keep in mind that this method working 4 data that follow normal distribution
+
+#method2_outlier:
 
 
 
